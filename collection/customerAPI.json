@@ -1,0 +1,503 @@
+{
+	"info": {
+		"_postman_id": "c5c47bc3-9db6-439e-9127-7b21be7e7d5a",
+		"name": "sdet_customer_api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Customer login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"var token = jsonData.token;\r",
+							"pm.environment.set(\"token\",token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"salman\",\r\n    \"password\":\"salman1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/customer/api/v1/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer",
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Negetive login case",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"salman\",\r\n    \"password\":\"salman12345\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/customer/api/v1/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer",
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Customer List",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Fetch customer list\", () => {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.Customers[0].id).to.eql(101);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/customer/api/v1/list",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer",
+						"api",
+						"v1",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Search customer list\", () => {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(101);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/customer/api/v1/get/101",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer",
+						"api",
+						"v1",
+						"get",
+						"101"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Negetive Customer Search",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Customer not found\", () => {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.error.message).to.eql(\"Customer info not found\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/customer/api/v1/get/999",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer",
+						"api",
+						"v1",
+						"get",
+						"999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Generate New Customer",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let id = _.random(1000, 9999)\r",
+							"pm.environment.set(\"id\", id);\r",
+							"\r",
+							"\r",
+							"// pm.collectionVariables.set(\"name\", name);\r",
+							"// pm.collectionVariables.set(\"email\", email);\r",
+							"// pm.collectionVariables.set(\"phone_number\", phone_w);\r",
+							"// pm.collectionVariables.set(\"address\", address);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check status\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"Success\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n \"id\": {{id}},\r\n \"name\": \"{{$randomFullName}}\",\r\n \"email\": \"{{$randomEmail}}\",\r\n \"address\": \"{{$randomStreetAddress}}\",\r\n \"phone_number\": \"{{$randomPhoneNumber}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/customer/api/v1/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer",
+						"api",
+						"v1",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Negetive Customer Creation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// let id=_.random(1000, 9999)\r",
+							"// pm.environment.set(\"id\",id );\r",
+							"// const reqObject = {\r",
+							"//  url: 'https://api.namefake.com/english-united-states/male/',\r",
+							"//  method: 'GET',\r",
+							"//  header: 'Content-Type:application/json'\r",
+							"// };\r",
+							"// pm.sendRequest(reqObject, (err, res) => {\r",
+							"//  let {name} = res.json()\r",
+							"//  let {phone_w}=res.json()\r",
+							"//  let {email_u} = res.json()\r",
+							"//  let email=email_u+'@testmail.com'\r",
+							" \r",
+							"//  pm.environment.set(\"name\", name);\r",
+							"//  pm.environment.set(\"email\", email);\r",
+							"//  pm.environment.set(\"phone_number\", phone_w);\r",
+							"// });\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 208\", function () {\r",
+							"    pm.response.to.have.status(208);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n \"id\": {{id}},\r\n \"name\": \"{{$randomFullName}}\",\r\n \"email\": \"whatev@test.com\",\r\n \"address\": \"anywhere,Dhaka\",\r\n \"phone_number\": \"01523348923\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/customer/api/v1/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer",
+						"api",
+						"v1",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Update Customer\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.Customers.address).includes(\"Gulshan\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 101,\r\n    \"name\": \"Mr. Kamal\",\r\n    \"email\": \"mrkamal@test.com\",\r\n    \"address\": \"Gulshan,Dhaka\",\r\n    \"phone_number\": \"01502020110\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/customer/api/v1/update/101",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer",
+						"api",
+						"v1",
+						"update",
+						"101"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Customer Deletion\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"Customer deleted!\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/customer/api/v1/delete/{{id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer",
+						"api",
+						"v1",
+						"delete",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://customer-test-api.herokuapp.com"
+		},
+		{
+			"key": "id",
+			"value": ""
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}
